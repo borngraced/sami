@@ -9,7 +9,7 @@ pub struct SamiCtx {
 impl SamiCtx {
     pub async fn ready() -> Self {
         let (client, connection) = tokio_postgres::connect(
-            "host=localhost port=5432 user=sami password=SamopE! dbname=sami_rs",
+            "",
             NoTls,
         )
         .await
