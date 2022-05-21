@@ -4,6 +4,8 @@ use scrypt::{
     Scrypt,
 };
 
+use crate::utils::error::SamiErrorWithData;
+
 use super::error::SamiError;
 
 pub fn validate_email(email: &String) -> Result<String, SamiError> {
@@ -14,14 +16,15 @@ pub fn validate_email(email: &String) -> Result<String, SamiError> {
     )
     .unwrap();
     if let false = email_regex.is_match(email.as_str()) {
-        return Err(SamiError::InvalidEmail {
-            field: email.to_string(),
-        });
+        return Err(SamiError::InvalidError(SamiErrorWithData {
+            field: "email".to_string(),
+            message: "Invalid email address".to_string(),
+        }));
     }
     Ok(email.to_string())
 }
 
-pub fn encode_password(password: String) -> Result<String, String> {
+pub fn encode_password(password: String) -> Result<String, SamiError> {
     debug!("Encoding password");
 
     let password = password.as_bytes(); // Bad password; don't actually use!
@@ -31,11 +34,14 @@ pub fn encode_password(password: String) -> Result<String, String> {
     let password_hash = Scrypt.hash_password(password, &salt);
     match password_hash {
         Ok(e) => Ok(e.to_string()),
-        Err(e) => Err(e.to_string()),
+        Err(e) => Err(SamiError::InvalidError(SamiErrorWithData {
+            field: "password".to_string(),
+            message: e.to_string(),
+        })),
     }
 }
 
-pub fn verify_password(password: String, password_hash: String) -> Result<String, String> {
+pub fn verify_password(password: String, password_hash: String) -> Result<String, SamiError> {
     debug!("Verifying password");
 
     let parsed_hash = PasswordHash::new(&password_hash).expect("password not hashable");
@@ -44,7 +50,10 @@ pub fn verify_password(password: String, password_hash: String) -> Result<String
         .is_ok();
     match verify {
         true => Ok(password),
-        false => Err("Invalid Password".to_string()),
+        false => Err(SamiError::InvalidError(SamiErrorWithData {
+            field: "password".to_string(),
+            message: "Password Incorrect".to_string(),
+        })),
     }
 }
 

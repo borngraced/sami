@@ -9,14 +9,19 @@ use actix_web::{
     Result as ActixWebResult,
 };
 use database::connect::SamiCtx;
+use dotenv::dotenv;
 use tokio_postgres::Client;
+use utils::error::SamiErrorWithData;
 
 use crate::{
     database::users::{
         add_new_user, get_single_user, login, GetUserRequest, UserLoginRequest, UserRequest,
+        UserResponse,
     },
-    utils::error::SamiError,
+    utils::error::{ErrorResponse, SamiError},
 };
+
+type SamiResult<T> = Result<T, SamiError>;
 
 #[get("/")]
 async fn hello() -> impl Responder {
@@ -33,40 +38,34 @@ async fn auth(
         email: req.email.to_string(),
         password: req.password.to_string(),
     };
-    let login = login(&client, &user).await;
-    match login {
-        Ok(t) => Ok(web::Json(t)),
-        Err(e) => return Err(e.to_owned()),
-    }
+    let login_res = login(&client, &user).await.map_err(|e| {
+        let err: UserResponse = e.into();
+        web::Json(err)
+    });
+    Ok(web::Json(login_res))
 }
 
 #[post("/user")]
-async fn new_user(
-    client: web::Data<Client>,
-    req: web::Json<UserRequest>,
-) -> ActixWebResult<impl Responder, SamiError> {
+async fn new_user(client: web::Data<Client>, req: web::Json<UserRequest>) -> impl Responder {
     let client = client.as_ref();
-    let user = add_new_user(&client, &req).await;
-    match user {
-        Ok(_) => Ok(format!("Account Creation Successful")),
-        Err(e) => return Err(e),
-    }
+    let res = match add_new_user(&client, &req).await {
+        Ok(e) => e,
+        Err(err) => err.into(),
+    };
+    web::Json(res)
 }
 
 #[get("/user")]
-async fn get_user(
-    client: web::Data<Client>,
-    req: web::Json<GetUserRequest>,
-) -> ActixWebResult<impl Responder, SamiError> {
+async fn get_user(client: web::Data<Client>, req: web::Json<GetUserRequest>) -> impl Responder {
     let client = client.as_ref();
     let user = GetUserRequest {
         email: req.email.to_string(),
     };
-    let user = get_single_user(&client, &user).await;
-    match user {
-        Ok(t) => Ok(web::Json(t)),
-        Err(e) => Err(e.to_owned()),
-    }
+    let res = match get_single_user(&client, &user).await {
+        Ok(res) => res,
+        Err(err) => err.into(),
+    };
+    web::Json(res)
 }
 
 #[post("/echo")]
@@ -75,10 +74,11 @@ async fn echo(req_body: String) -> impl Responder {
 }
 
 #[actix_web::main]
-async fn main() -> std::io::Result<()> {
+async fn main() -> SamiResult<()> {
     env_logger::init_from_env(env_logger::Env::default().default_filter_or("info"));
+    dotenv().ok();
 
-    let db = SamiCtx::ready().await;
+    let db = SamiCtx::ready().await?;
     let _ = db.init_db().await;
     let data = web::Data::new(db.client);
 
@@ -91,7 +91,19 @@ async fn main() -> std::io::Result<()> {
             .service(new_user)
             .service(get_user)
     })
-    .bind(("127.0.0.1", 8080))?
+    .bind(("127.0.0.1", 5050))
+    .map_err(|e| {
+        SamiError::UnexpectedError(SamiErrorWithData {
+            field: "port".to_string(),
+            message: e.to_string(),
+        })
+    })?
     .run()
     .await
+    .map_err(|e| {
+        SamiError::UnexpectedError(SamiErrorWithData {
+            field: "port".to_string(),
+            message: e.to_string(),
+        })
+    })
 }

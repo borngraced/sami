@@ -3,16 +3,24 @@ use derive_more::Display;
 use serde::{Deserialize, Serialize};
 use tokio_postgres::{
     types::{FromSql, ToSql},
-    Client, Error as PostgresError,
+    Client,
 };
 
 use crate::utils::{
-    error::SamiError,
-    logger::my_logger,
+    error::{ErrorResponse, SamiError},
     validator::{encode_password, validate_email, verify_password},
 };
 
 use super::statements::{CREATE_USER_TABLE, GET_SINGLE_USER, INSERT_USER};
+
+type SamiWebResponse<T> = Result<T, ErrorResponse>;
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct UserResponse {
+    pub data: Option<UserResponseData>,
+    pub error: Option<ErrorResponse>,
+    pub success: bool,
+}
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct UserRequest {
@@ -28,13 +36,14 @@ pub struct UserLoginRequest {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct UserResponse {
+pub struct UserResponseData {
     pub uuid: i32,
     pub email: String,
     pub username: String,
     pub created_at: DateTime<Utc>,
     pub role: Role,
 }
+
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum Role {
     HeadBoy,
@@ -100,61 +109,56 @@ pub struct LoginErrResponse {
 
 // impl Pos for
 
-pub async fn create_table(client: &Client) -> Result<u64, PostgresError> {
-    client.execute(CREATE_USER_TABLE, &[]).await.map_err(|e| e)
+pub async fn create_table(client: &Client) -> Result<u64, SamiError> {
+    client
+        .execute(CREATE_USER_TABLE, &[])
+        .await
+        .map_err(|e| SamiError::InternalError {
+            field: e.to_string(),
+        })
 }
 
-pub async fn login(client: &Client, user: &UserLoginRequest) -> Result<UserResponse, SamiError> {
+pub async fn login(client: &Client, user: &UserLoginRequest) -> SamiWebResponse<UserResponse> {
     info!("Creating user {}../", user.email);
 
-    if let Ok(row) = client
+    let get_q = client
         .query_one(
             "SELECT password FROM users WHERE email = $1",
             &[&user.email.to_owned() as &(dyn ToSql + Sync)],
         )
         .await
-        .map_err(|_e| SamiError::AccountNotFoundError)
-    {
-        let parsed_hash = row.get("password");
-        if let Err(e) = verify_password(user.password.to_owned(), parsed_hash)
-            .map_err(|_| SamiError::PasswordError)
-        {
-            return Err(e);
-        }
-    }
+        .map_err(|e| e.into())?;
+
+    let parsed_hash = get_q.get("password");
+    verify_password(user.password.to_owned(), parsed_hash).map_err(|e| {
+        let re: ErrorResponse = e.into();
+        re
+    });
 
     let params = &[&user.email.to_owned() as &(dyn ToSql + Sync)];
     let row = client
         .query_one(GET_SINGLE_USER, params)
         .await
-        .map_err(|e| e);
+        .map_err(|e| e.into())?;
 
-    match row {
-        Ok(e) => Ok(UserResponse {
-            uuid: e.get("uuid"),
-            email: e.get("email"),
-            username: e.get("username"),
-            created_at: e.get("created_at"),
-            role: e.get("role"),
+    Ok(UserResponse {
+        data: Some(UserResponseData {
+            uuid: row.get("uuid"),
+            email: row.get("email"),
+            username: row.get("username"),
+            created_at: row.get("created_at"),
+            role: row.get("role"),
         }),
-        Err(e) => Err(SamiError::UnexpectedError {
-            field: e.to_string(),
-        }),
-    }
+        error: None,
+        success: true,
+    })
 }
 
-pub async fn add_new_user(client: &Client, user: &UserRequest) -> Result<u64, SamiError> {
+pub async fn add_new_user(client: &Client, user: &UserRequest) -> SamiWebResponse<UserResponse> {
     info!("Creating user {}../", user.email);
-    if let Err(e) = validate_email(&user.email).or_else(|e| return Err(e)) {
-        return Err(e);
-    };
-
+    validate_email(&user.email).map_err(|e| e.into())?;
     let (password, role) = (
-        if let Ok(e) = encode_password(user.password.to_owned()) {
-            e
-        } else {
-            return Err(SamiError::InternalError);
-        },
+        encode_password(user.password.to_owned()).map_err(|e| e.into())?,
         Role::default(),
     );
 
@@ -164,35 +168,38 @@ pub async fn add_new_user(client: &Client, user: &UserRequest) -> Result<u64, Sa
         password,
         role.to_string(),
     ];
-    client
+    let res = client
         .execute_raw(INSERT_USER, params)
         .await
-        .map_err(|e| SamiError::AccountCreationError {
-            field: e.to_string(),
-        })
+        .map_err(|e| e.into())?;
+
+    Ok(UserResponse {
+        data: None,
+        error: None,
+        success: true,
+    })
 }
 
 pub async fn get_single_user(
     client: &Client,
     user: &GetUserRequest,
-) -> Result<UserResponse, SamiError> {
+) -> Result<UserResponse, ErrorResponse> {
     info!("Getting user data from DB {}../", user.email);
     let params = &[&user.email.to_owned() as &(dyn ToSql + Sync)];
     let row = client
         .query_one(GET_SINGLE_USER, params)
         .await
-        .map_err(|e| e);
+        .map_err(|e| e.into())?;
 
-    match row {
-        Ok(e) => Ok(UserResponse {
-            uuid: e.get("uuid"),
-            email: e.get("email"),
-            username: e.get("username"),
-            created_at: e.get("created_at"),
-            role: e.get("role"),
+    Ok(UserResponse {
+        data: Some(UserResponseData {
+            uuid: row.get("uuid"),
+            email: row.get("email"),
+            username: row.get("username"),
+            created_at: row.get("created_at"),
+            role: row.get("role"),
         }),
-        Err(e) => Err(SamiError::UnexpectedError {
-            field: e.to_string(),
-        }),
-    }
+        error: None,
+        success: true,
+    })
 }
