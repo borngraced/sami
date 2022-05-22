@@ -11,4 +11,4 @@ pub const INSERT_USER: &str =
     "INSERT INTO users (username, email, password, role) VALUES ($1, $2, $3, $4)";
 
 pub const GET_SINGLE_USER: &str =
-    "SELECT uuid, email, username, created_at, role FROM users WHERE email = $1";
+    "SELECT uuid, email, username, created_at, role FROM users WHERE uuid = $1";

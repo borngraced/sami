@@ -1,6 +1,9 @@
 use tokio_postgres::{Client, Error, NoTls};
 
-use crate::utils::{error::SamiError, read_env::db_from_env};
+use crate::common::{
+    error::{ErrorResponse, SamiError, SamiStatusCode},
+    read_env::data_from_env,
+};
 
 use super::users::create_table;
 
@@ -9,17 +12,21 @@ pub struct SamiCtx {
 }
 
 impl SamiCtx {
-    pub async fn ready() -> Result<Self, SamiError> {
-        let config = db_from_env("DB").map_err(|e| e)?;
+    pub async fn ready() -> Result<Self, ErrorResponse> {
+        let config = data_from_env("DB").map_err(|e| e)?;
         let (client, connection) = tokio_postgres::connect(config.as_str(), NoTls)
             .await
-            .map_err(|e| SamiError::InternalError {
-                field: e.to_string(),
+            .map_err(|e| ErrorResponse {
+                field: None,
+                message: Some(e.to_string()),
+                code: SamiStatusCode::Sql,
             })?;
 
         tokio::spawn(async move {
-            connection.await.map_err(|e| SamiError::InternalError {
-                field: e.to_string(),
+            connection.await.map_err(|e| ErrorResponse {
+                field: None,
+                message: Some(e.to_string()),
+                code: SamiStatusCode::Sql,
             })
         });
         Ok(Self { client })
