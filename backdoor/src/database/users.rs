@@ -1,5 +1,3 @@
-use actix_web::Responder;
-use chrono::{DateTime, Utc};
 use derive_more::Display;
 use serde::{Deserialize, Serialize};
 use tokio_postgres::{
@@ -9,15 +7,14 @@ use tokio_postgres::{
 
 use crate::common::{
     error::{ErrorResponse, SamiError, SamiStatusCode},
-    responder::{Role, SamiResponder, UserData},
+    responder::{SamiResponder, SamiWebResponse},
     validator::{
         encode_password, validate_email, validate_password, validate_username, verify_password,
     },
+    Role, UserData,
 };
 
-use super::statements::{CREATE_USER_TABLE, GET_SINGLE_USER, INSERT_USER};
-
-type SamiWebResponse<T> = Result<T, ErrorResponse>;
+use super::statements::{GET_SINGLE_USER, INSERT_USER};
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct UserRequest {
@@ -30,51 +27,6 @@ pub struct UserRequest {
 pub struct UserLoginRequest {
     pub email: String,
     pub password: String,
-}
-
-impl ToString for Role {
-    fn to_string(&self) -> String {
-        match self {
-            Role::HeadBoy => format!("{:?}", Self::HeadBoy),
-            Role::NoRole => format!("{:?}", Self::NoRole),
-        }
-    }
-}
-
-impl Default for Role {
-    fn default() -> Self {
-        Self::HeadBoy
-    }
-}
-
-impl From<String> for Role {
-    fn from(e: String) -> Self {
-        match &e.to_lowercase().as_str() {
-            &"headboy" => Self::HeadBoy,
-            _ => Self::NoRole,
-        }
-    }
-}
-
-impl FromSql<'_> for Role {
-    fn from_sql<'a>(
-        ty: &tokio_postgres::types::Type,
-        _raw: &'a [u8],
-    ) -> Result<Self, Box<dyn std::error::Error + Sync + Send>> {
-        match ty.kind() {
-            tokio_postgres::types::Kind::Simple => Ok(Self::HeadBoy),
-            tokio_postgres::types::Kind::Enum(_) => Ok(Self::HeadBoy),
-            _ => Ok(Self::NoRole),
-        }
-    }
-
-    fn accepts(ty: &tokio_postgres::types::Type) -> bool {
-        match ty.kind() {
-            tokio_postgres::types::Kind::Simple => true,
-            tokio_postgres::types::Kind::Enum(_) => true,
-            _ => false,
-        }
-    }
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -90,15 +42,6 @@ pub struct LoginErrResponse {
 }
 
 // impl Pos for
-
-pub async fn create_table(client: &Client) -> Result<u64, SamiError> {
-    client
-        .execute(CREATE_USER_TABLE, &[])
-        .await
-        .map_err(|e| SamiError::InternalError {
-            field: e.to_string(),
-        })
-}
 
 pub async fn login(
     client: &Client,

@@ -41,18 +41,3 @@ impl<T: Clone + Debug + Serialize> ResponseError for SamiResponder<T> {
         }
     }
 }
-
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct UserData {
-    pub uuid: i32,
-    pub email: String,
-    pub username: String,
-    pub created_at: DateTime<Utc>,
-    pub role: Role,
-}
-
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub enum Role {
-    HeadBoy,
-    NoRole,
-}

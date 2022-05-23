@@ -1,7 +1,6 @@
 #[path = "library/auth.rs"]
 pub mod auth;
 
-use crate::common::error::ErrorResponse;
 use actix_web::dev::ServiceRequest;
 use actix_web::Error;
 use actix_web_httpauth::extractors::{

@@ -79,20 +79,10 @@ impl Into<ErrorResponse> for SamiError {
 
 impl Into<ErrorResponse> for PostgresError {
     fn into(self) -> ErrorResponse {
-        match self.as_db_error() {
-            Some(res) => ErrorResponse {
-                field: res.column().map(|e| e.to_string()),
-                message: res.detail().map(|e| e.to_string()),
-                code: SamiStatusCode::Sql,
-            },
-            None => ErrorResponse {
-                field: None,
-                message: Some(format!(
-                    "DB unable to process the result / not found, {:?}",
-                    self.into_source()
-                )),
-                code: SamiStatusCode::Sql,
-            },
+        ErrorResponse {
+            field: None,
+            message: Some(self.to_string()),
+            code: SamiStatusCode::Sql,
         }
     }
 }
