@@ -1,17 +1,18 @@
+use actix_web::Result;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use tokio_postgres::types::FromSql;
 
+#[path = "common/auth_helper/auth.rs"]
+pub mod auth;
 #[path = "common/error.rs"]
 pub mod error;
 #[path = "common/read_env.rs"]
 pub mod read_env;
 #[path = "common/responder.rs"]
 pub mod responder;
-#[path = "common/validator.rs"]
+#[path = "common/auth_helper/validator.rs"]
 pub mod validator;
-
-pub type SamiWebResponse<T> = Result<T, error::ErrorResponse>;
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct UserData {
@@ -82,6 +83,7 @@ pub struct ArticleData {
     pub slug: String,
     pub likes: Option<i32>,
     pub published: bool,
+    pub tags: Vec<String>,
     pub updated_at: Option<DateTime<Utc>>,
     pub created_at: Option<DateTime<Utc>>,
 }
@@ -93,36 +95,7 @@ pub struct ArticleDataReq {
     pub summary: String,
     pub slug: String,
     pub published: bool,
-}
-
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct ArticleUpdateData {
-    pub field: ArticleUpdateDataEnum,
-    pub slug: String,
-    pub content: String,
-}
-
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub enum ArticleUpdateDataEnum {
-    Title,
-    Content,
-    Summary,
-    Published,
-    Likes,
-    None,
-}
-
-impl From<String> for ArticleUpdateDataEnum {
-    fn from(e: String) -> Self {
-        match e.to_lowercase().as_str() {
-            "title" => ArticleUpdateDataEnum::Title,
-            "content" => ArticleUpdateDataEnum::Content,
-            "summary" => ArticleUpdateDataEnum::Summary,
-            "published" => ArticleUpdateDataEnum::Published,
-            "likes" => ArticleUpdateDataEnum::Likes,
-            _ => ArticleUpdateDataEnum::None,
-        }
-    }
+    pub tags: Vec<String>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -132,4 +105,15 @@ pub struct CategoryData {
     pub username: String,
     pub created_at: DateTime<Utc>,
     pub role: Role,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct ContentReq {
+    pub content: serde_json::Value,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ArticleEditRequest {
+    pub slug: String,
+    pub field: String,
 }

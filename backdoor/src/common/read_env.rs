@@ -1,6 +1,6 @@
 use std::env;
 
-use super::error::{ErrorResponse, SamiError, SamiStatusCode};
+use super::error::{ErrorResponse, SamiStatusCode};
 
 pub fn data_from_env(name: &str) -> Result<String, ErrorResponse> {
     let env = env::var(name).map_err(|e| ErrorResponse {

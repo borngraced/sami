@@ -2,7 +2,6 @@ use actix_web::{
     http::{header::ContentType, StatusCode},
     HttpResponse, ResponseError,
 };
-use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 use super::error::{ErrorResponse, SamiStatusCode};
@@ -38,6 +37,7 @@ impl<T: Clone + Debug + Serialize> ResponseError for SamiResponder<T> {
             SamiStatusCode::Sql => StatusCode::UNPROCESSABLE_ENTITY,
             SamiStatusCode::NotFound => StatusCode::NOT_FOUND,
             SamiStatusCode::ExpectationFailed => StatusCode::EXPECTATION_FAILED,
+            SamiStatusCode::AuthenticationFailed => StatusCode::UNAUTHORIZED,
         }
     }
 }

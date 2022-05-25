@@ -1,12 +1,10 @@
+use actix_session::Session;
 use derive_more::Display;
 use serde::{Deserialize, Serialize};
-use tokio_postgres::{
-    types::{FromSql, ToSql},
-    Client,
-};
+use tokio_postgres::{types::ToSql, Client};
 
 use crate::common::{
-    error::{ErrorResponse, SamiError, SamiStatusCode},
+    error::{ErrorResponse, SamiStatusCode},
     responder::{SamiResponder, SamiWebResponse},
     validator::{
         encode_password, validate_email, validate_password, validate_username, verify_password,
@@ -46,8 +44,9 @@ pub struct LoginErrResponse {
 pub async fn login(
     client: &Client,
     user: &UserLoginRequest,
+    session: Session,
 ) -> SamiWebResponse<SamiResponder<UserData>> {
-    info!("Creating user {}../", user.email);
+    info!("Authorizing user {}../", user.email);
 
     let get_password = client
         .query_one(
@@ -56,24 +55,35 @@ pub async fn login(
         )
         .await
         .map_err(|e| e.into())?;
-
     let parsed_hash: String = get_password.get("password");
-
     verify_password(&user.password, &parsed_hash).map_err(|e| {
-        let re: ErrorResponse = e.into();
-        re
+        let e: ErrorResponse = e.into();
+        e
     })?;
 
     let params = &[&user.email.to_owned() as &(dyn ToSql + Sync)];
     let row = client
-        .query_one(GET_SINGLE_USER, params)
+        .query_one(
+            "SELECT email, uuid, username, created_at, role FROM users WHERE email = $1",
+            params,
+        )
         .await
         .map_err(|e| e.into())?;
 
+    // IF VALID USER
+    info!("Creatinng session with user email {}../", user.email);
+    let email: String = row.get("email");
+    let _ = session
+        .insert("user_email", &email)
+        .map_err(|e| ErrorResponse {
+            field: None,
+            message: Some(e.to_string()),
+            code: SamiStatusCode::Internal,
+        });
     Ok(SamiResponder {
         data: Some(UserData {
             uuid: row.get("uuid"),
-            email: row.get("email"),
+            email,
             username: row.get("username"),
             created_at: row.get("created_at"),
             role: row.get("role"),
@@ -87,6 +97,7 @@ pub async fn login(
 pub async fn add_new_user(
     client: &Client,
     user: &UserRequest,
+    session: Session,
 ) -> SamiWebResponse<SamiResponder<UserData>> {
     info!("Creating user {}../", user.email);
 
@@ -110,6 +121,14 @@ pub async fn add_new_user(
         .await
         .map_err(|err| err.into())?;
 
+    // IF SUCCESSFUL
+    let _ = session
+        .insert("user_email", &user.email)
+        .map_err(|e| ErrorResponse {
+            field: None,
+            message: Some(e.to_string()),
+            code: SamiStatusCode::Internal,
+        });
     Ok(SamiResponder {
         data: None,
         error: None,

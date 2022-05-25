@@ -1,8 +1,12 @@
+use actix_session::Session;
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
 use tokio_postgres::Client;
 
 use crate::{
-    common::{responder::SamiResponder, ArticleData, ArticleDataReq, ArticleUpdateData, UserData},
+    common::{
+        auth::verify_auth_token, responder::SamiResponder, ArticleData, ArticleDataReq,
+        ArticleEditRequest, ContentReq, UserData,
+    },
     database::{
         article::{
             add_new_article_to_db, delete_article_from_db, get_article_from_db,
@@ -13,15 +17,19 @@ use crate::{
 };
 
 // START USER API CALLS
-#[get("/auth")]
-pub async fn auth(client: web::Data<Client>, req: web::Json<UserLoginRequest>) -> impl Responder {
+#[post("/auth/")]
+pub async fn auth(
+    client: web::Data<Client>,
+    req: web::Json<UserLoginRequest>,
+    session: Session,
+) -> impl Responder {
     let client = client.as_ref();
     let user = UserLoginRequest {
         email: req.email.to_string(),
         password: req.password.to_string(),
     };
 
-    login(&client, &user)
+    login(&client, &user, session)
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(|err| {
@@ -29,11 +37,21 @@ pub async fn auth(client: web::Data<Client>, req: web::Json<UserLoginRequest>) -
             err
         })
 }
+// START USER API CALLS
+#[post("/logout/")]
+pub async fn logout(session: Session) -> impl Responder {
+    session.clear();
+    HttpResponse::Ok()
+}
 
-#[post("/user")]
-pub async fn new_user(client: web::Data<Client>, req: web::Json<UserRequest>) -> impl Responder {
+#[post("/user/")]
+pub async fn new_user(
+    client: web::Data<Client>,
+    req: web::Json<UserRequest>,
+    session: Session,
+) -> impl Responder {
     let client = client.as_ref();
-    add_new_user(&client, &req)
+    add_new_user(&client, &req, session)
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(|err| {
@@ -42,8 +60,13 @@ pub async fn new_user(client: web::Data<Client>, req: web::Json<UserRequest>) ->
         })
 }
 
-#[get("/user/{uuid}")]
-pub async fn get_user(client: web::Data<Client>, uuid: web::Path<(i32,)>) -> impl Responder {
+#[get("/user/{uuid}/")]
+pub async fn get_user(
+    client: web::Data<Client>,
+    uuid: web::Path<(i32,)>,
+    session: Session,
+) -> impl Responder {
+    verify_auth_token::<UserData>(session)?;
     let client = client.as_ref();
     let uuid = uuid.into_inner().0;
 
@@ -57,11 +80,14 @@ pub async fn get_user(client: web::Data<Client>, uuid: web::Path<(i32,)>) -> imp
 }
 
 // START ARTICLE API CALLS
-#[post("/article")]
+#[post("/article/")]
 pub async fn new_article(
     client: web::Data<Client>,
     req: web::Json<ArticleDataReq>,
+    session: Session,
 ) -> impl Responder {
+    verify_auth_token::<ArticleDataReq>(session)?;
+
     let client = client.as_ref();
     add_new_article_to_db(&client, &req)
         .await
@@ -72,7 +98,7 @@ pub async fn new_article(
         })
 }
 
-#[get("/article/{slug}")]
+#[get("/article/{slug}/")]
 pub async fn get_one_article(
     client: web::Data<Client>,
     slug: web::Path<(String,)>,
@@ -84,12 +110,12 @@ pub async fn get_one_article(
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(|err| {
-            let err: SamiResponder<UserData> = err.into();
+            let err: SamiResponder<ArticleData> = err.into();
             err
         })
 }
 
-#[get("/articles")]
+#[get("/articles/")]
 pub async fn get_all_article(client: web::Data<Client>) -> impl Responder {
     let client = client.as_ref();
 
@@ -97,32 +123,41 @@ pub async fn get_all_article(client: web::Data<Client>) -> impl Responder {
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(|err| {
-            let err: SamiResponder<UserData> = err.into();
+            let err: SamiResponder<ArticleData> = err.into();
             err
         })
 }
 
-#[put("/article")]
+#[put("/article/")]
 pub async fn update_one_article(
     client: web::Data<Client>,
-    req: web::Json<ArticleUpdateData>,
+    req: web::Json<ContentReq>,
+    path: web::Query<ArticleEditRequest>,
+    session: Session,
 ) -> impl Responder {
-    let client = client.as_ref();
+    verify_auth_token::<ArticleData>(session)?;
 
-    update_article_to_db(&client, &req)
+    let client = client.as_ref();
+    let path = path.into_inner();
+    let (slug, field) = (&path.slug, &path.field);
+    println!("{}:{}", slug, field);
+    update_article_to_db(&client, &req, slug.to_owned(), field.to_owned())
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(|err| {
-            let err: SamiResponder<UserData> = err.into();
+            let err: SamiResponder<ArticleData> = err.into();
             err
         })
 }
 
-#[delete("/article/{slug}")]
+#[delete("/article/{slug}/")]
 pub async fn delete_one_article(
     client: web::Data<Client>,
     slug: web::Path<(String,)>,
+    session: Session,
 ) -> impl Responder {
+    verify_auth_token::<ArticleData>(session)?;
+
     let client = client.as_ref();
     let slug = slug.into_inner().0;
 
@@ -130,7 +165,7 @@ pub async fn delete_one_article(
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(|err| {
-            let err: SamiResponder<UserData> = err.into();
+            let err: SamiResponder<ArticleData> = err.into();
             err
         })
 }
