@@ -11,7 +11,7 @@ pub fn data_from_env(name: &str) -> Result<String, ErrorResponse> {
 
     match name.to_lowercase().as_str() {
         "db" => {
-            let res = env.replace("/", " ").replace("-", "=");
+            let res = env.replace("/", " ").replace("*", "=");
             Ok(res)
         }
         _ => Ok(env),
