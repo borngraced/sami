@@ -33,9 +33,9 @@ pub const INSERT_ARTICLE: &str =
     "INSERT INTO article (title, content, summary, slug, published, tags) VALUES ($1, $2, $3, $4, $5, $6)";
 
 pub const GET_SINGLE_ARTICLE: &str =
-    "SELECT uuid, title, content, summary, slug, created_at, updated_at, likes, published FROM article WHERE slug = $1";
+    "SELECT uuid, title, content, summary, slug, created_at, updated_at, likes, published, tags FROM article WHERE slug = $1";
 
-pub const GET_ALL_ARTICLE: &str = "SELECT uuid, title, content, summary, slug, created_at, updated_at, likes, published FROM article";
+pub const GET_ALL_ARTICLE: &str = "SELECT uuid, title, content, summary, slug, created_at, updated_at, likes, published, tags FROM article";
 
 pub const UPDATE_SINGLE_ARTICLE_TITLE: &str = "UPDATE article SET title = $2 WHERE slug = $1";
 

@@ -25,7 +25,6 @@ pub async fn add_new_article_to_db(
         &article_data.slug.to_owned() as &(dyn ToSql + Sync),
         &article_data.published.to_owned() as &(dyn ToSql + Sync),
         &article_data.tags.to_owned() as &(dyn ToSql + Sync),
-        
     ];
     let _ = client
         .execute(INSERT_ARTICLE, params)

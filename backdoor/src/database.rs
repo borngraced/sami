@@ -1,3 +1,4 @@
+#[path = "database/article.rs"]
 pub mod article;
 #[path = "database/statements.rs"]
 pub mod statements;
@@ -44,8 +45,8 @@ impl SamiCtx {
             .execute(statement, &[])
             .await
             .map_err(|e| ErrorResponse {
-                field: None,
-                message: Some(e.to_string()),
+                field: Option::default(),
+                message: Option::from(e.to_string()),
                 code: SamiStatusCode::ExpectationFailed,
             })?;
 

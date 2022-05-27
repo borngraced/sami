@@ -53,12 +53,6 @@ impl<T: Clone + Debug> Into<SamiResponder<T>> for ErrorResponse {
 }
 
 impl ResponseError for ErrorResponse {
-    fn error_response(&self) -> HttpResponse {
-        HttpResponse::build(self.status_code())
-            .insert_header(ContentType::html())
-            .json(self)
-    }
-    
     fn status_code(&self) -> StatusCode {
         match &self.code {
             SamiStatusCode::OK => StatusCode::OK,
@@ -69,5 +63,11 @@ impl ResponseError for ErrorResponse {
             SamiStatusCode::ExpectationFailed => StatusCode::EXPECTATION_FAILED,
             SamiStatusCode::AuthenticationFailed => StatusCode::UNAUTHORIZED,
         }
+    }
+
+    fn error_response(&self) -> HttpResponse {
+        HttpResponse::build(self.status_code())
+            .insert_header(ContentType::html())
+            .json(self)
     }
 }

@@ -123,7 +123,7 @@ pub async fn get_all_article(client: web::Data<Client>) -> impl Responder {
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(|err| {
-            let err: SamiResponder<ArticleData> = err.into();
+            let err: SamiResponder<Vec<ArticleData>> = err.into();
             err
         })
 }
