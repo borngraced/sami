@@ -55,7 +55,7 @@ async fn main() -> SamiWebResponse<()> {
             .service(routes::update_one_article)
             .service(routes::delete_one_article)
     })
-    .bind("0.0.0.0:8088")
+    .bind(("127.0.0.1", 5500))
     .map_err(|e| ErrorResponse {
         field: None,
         message: Some(e.to_string()),
