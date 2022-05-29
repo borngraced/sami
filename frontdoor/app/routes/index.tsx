@@ -24,7 +24,6 @@ export const loader: LoaderFunction = async () => {
 
 export default function Index() {
   const data = useLoaderData();
-  console.log(data);
 
   return (
     <div className="block h-full w-full">
