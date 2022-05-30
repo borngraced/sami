@@ -86,6 +86,7 @@ pub struct ArticleData {
     pub tags: Vec<String>,
     pub updated_at: Option<DateTime<Utc>>,
     pub created_at: Option<DateTime<Utc>>,
+    pub author_id: i32,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -96,6 +97,7 @@ pub struct ArticleDataReq {
     pub slug: String,
     pub published: bool,
     pub tags: Vec<String>,
+    pub author_id: i32,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]

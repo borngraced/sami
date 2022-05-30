@@ -25,6 +25,7 @@ pub async fn add_new_article_to_db(
         &article_data.slug.to_owned() as &(dyn ToSql + Sync),
         &article_data.published.to_owned() as &(dyn ToSql + Sync),
         &article_data.tags.to_owned() as &(dyn ToSql + Sync),
+        &article_data.author_id.to_owned() as &(dyn ToSql + Sync),
     ];
     let _ = client
         .execute(INSERT_ARTICLE, params)
@@ -58,6 +59,7 @@ pub async fn get_article_from_db(
         likes: row.get("likes"),
         published: row.get("published"),
         tags: row.get("tags"),
+        author_id: row.get("author_id"),
         updated_at: row.get("updated_at"),
         created_at: row.get("created_at"),
     };
@@ -90,6 +92,7 @@ pub async fn get_articles_from_db(
             tags: row.get("tags"),
             updated_at: row.get("updated_at"),
             created_at: row.get("created_at"),
+            author_id: row.get("author_id"),
         })
     }
     Ok(SamiResponder {

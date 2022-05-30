@@ -13,7 +13,7 @@ import styles from "./styles/app.css";
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
-  title: "New Remix App",
+  title: "Sami",
   viewport: "width=device-width,initial-scale=1",
 });
 
@@ -28,7 +28,7 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body className="block max-w-screen-xl mx-auto p-2 md:p-4">
+      <body className="block bg-slate-900">
         <Header />
         <Outlet />
         <Footer />

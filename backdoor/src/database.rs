@@ -12,7 +12,7 @@ use crate::common::{
     read_env::data_from_env,
 };
 
-use self::statements::{CREATE_ARTCLE_TABLE, CREATE_USER_TABLE};
+use self::statements::{ADD_AUTHOR_ID, CREATE_ARTCLE_TABLE, CREATE_USER_TABLE};
 
 pub struct SamiCtx {
     pub client: Client,
@@ -55,7 +55,7 @@ impl SamiCtx {
 
     pub async fn init_db(&self) -> Result<(), ErrorResponse> {
         info!("Starting DB Migration");
-        let work_to_do = vec![CREATE_USER_TABLE, CREATE_ARTCLE_TABLE];
+        let work_to_do = vec![CREATE_USER_TABLE, CREATE_ARTCLE_TABLE, ADD_AUTHOR_ID];
         for st in work_to_do {
             self.create_migration(st).await?
         }

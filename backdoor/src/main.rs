@@ -24,7 +24,7 @@ async fn main() -> SamiWebResponse<()> {
     dotenv().ok();
 
     let db = SamiCtx::ready().await?;
-    db.init_db().await.map_err(|e| e.into())?;
+    db.init_db().await?;
     let data = web::Data::new(db.client);
     let secret_key = Key::generate();
 

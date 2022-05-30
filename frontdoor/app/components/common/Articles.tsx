@@ -1,5 +1,6 @@
 import { Link } from "@remix-run/react";
 import React from "react";
+import Tags from "~/components/common/Tags";
 
 export interface ArticleIT {
   uuid: Number;
@@ -16,35 +17,32 @@ export interface ArticleIT {
 type Props = {
   articles: ArticleIT[];
 };
+
 let emojis = ["😇", "🤪", "🥳", "🤩", "🤯", "🤗", "❤️", "💙", "💚", "💜"];
 function Articles({ articles }: Props) {
   const show_articles = articles?.map((article: ArticleIT) => {
-    let rand = Math.floor(Math.random() * emojis.length);
-    let show_tags = article?.tags?.map((e: String) => {
-      return (
-        <span className="tags text-xs text-gray-400">{"#" + e + " "}</span>
-      );
-    });
+    let emojisRand = Math.floor(Math.random() * emojis.length);
+
     return (
-      <div className="key" key={String(article.uuid) + "sami"}>
+      <div className="transition-all ease-in delay-75 bg-slate-800 shadow-md p-4 font-semibold rounded-md text-white text-opacity-70 hover:scale-105" key={String(article.uuid) + "sami"}>
         <Link to={`/${article.slug}`}>
-          <h2 className="transition-all ease-in title font-mono text-xl hover:text-gray-300 cursor-pointer">
-            {article.title.toLocaleLowerCase() + " " + emojis[rand]}
+          <h2 className="transition-all ease-in delay-100 title font-mono text-md md:text-2xl hover:text-gray-300 cursor-pointer antialiased tracking-wider pb-1">
+            {article.title.toLocaleLowerCase() + " " + emojis[emojisRand]}
           </h2>
-          <p className="transition-all ease-in summary font-mono">
+          <p className="transition-all ease-in delay-150 summary text-sm md:text-md font-mono font-light italic antialiased tracking-wide pb-3">
             {article.summary}...
           </p>
-          <div className="tags inline">{show_tags}</div>
+         <Tags tags={article?.tags}/>
         </Link>
       </div>
     );
   });
   return (
     <div className="block my-4 p-3 md:p-0">
-      <div className="font-mono text-xl border-b-2 border-orange-100 py-4">
-        .....💭
+      <div className="font-mono uppercase text-white text-opacity-70 text-xl pt-4 tracking-widest">
+        Thoughts 💭
       </div>
-      <div className="articles block my-4">{show_articles}</div>
+      <div className="articles flex flex-col my-4 gap-y-4">{show_articles}</div>
     </div>
   );
 }
