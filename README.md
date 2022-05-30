@@ -1,9 +1,9 @@
 # sami
 Sami (Rust, Typescript and PostgresQL Fullstack Web App)
 
-This is a fullstack personal blog application for myself written in:
-API BACKEND – `RUST/actix/postgresQL`
-FRONTEND — `Typescript/Remixjs`
+This is a fullstack personal blog application for myself written in: <br/>
+```API BACKEND – RUST/actix/postgresQL```<br/>
+```FRONTEND — Typescript/Remixjs```
 
 
 <h2>How To Run Locally</h2>
