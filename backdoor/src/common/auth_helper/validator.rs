@@ -130,24 +130,24 @@ mod tests {
 
     #[test]
     fn en_n_de_code_ps() {
-        let ecode = encode_password("SamopE160!".to_string()).unwrap();
-        let dcode = verify_password("SamopE160!", &ecode).unwrap();
+        let ecode = encode_password("OogeelyDoogely!".to_string()).unwrap();
+        let dcode = verify_password("OogeelyDoogely!", &ecode).unwrap();
         assert_eq!((), dcode);
     }
 
     #[test]
     fn validate_email_test() {
         assert_eq!(
-            "sami@gmail.com".to_string(),
-            validate_email(&"sami@gmail.com".to_string()).unwrap()
+            "OogeelyDoogely@gmail.com".to_string(),
+            validate_email(&"OogeelyDoogely@gmail.com".to_string()).unwrap()
         )
     }
 
     #[test]
     fn validate_username_test() {
         assert_eq!(
-            "bsto0403".to_string(),
-            validate_username(&"bsto0403".to_string()).unwrap()
+            "OogeelyDoogely".to_string(),
+            validate_username(&"OogeelyDoogely".to_string()).unwrap()
         )
     }
 
