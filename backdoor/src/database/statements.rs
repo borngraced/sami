@@ -25,17 +25,20 @@ pub const CREATE_ARTCLE_TABLE: &str = "CREATE TABLE IF NOT EXISTS article(
  published BOOL NOT NULL DEFAULT TRUE,
  likes INT DEFAULT 0,
  tags TEXT[],
+ author_id INT NOT NULL, 
  updated_at timestamp with time zone DEFAULT (now() at time zone 'utc') NOT NULL,
- created_at timestamp with time zone DEFAULT (now() at time zone 'utc') NOT NULL
+ created_at timestamp with time zone DEFAULT (now() at time zone 'utc') NOT NULL,
+ CONSTRAINT fk_author FOREIGN KEY(author_id) REFERENCES users(uuid)
 )";
 
 pub const INSERT_ARTICLE: &str =
-    "INSERT INTO article (title, content, summary, slug, published, tags) VALUES ($1, $2, $3, $4, $5, $6)";
+    "INSERT INTO article (title, content, summary, slug, published, tags, author_id) VALUES ($1, $2, $3, $4, $5, $6, \
+    $7)";
 
 pub const GET_SINGLE_ARTICLE: &str =
-    "SELECT uuid, title, content, summary, slug, created_at, updated_at, likes, published, tags FROM article WHERE slug = $1";
+    "SELECT uuid, author_id, title, content, summary, slug, created_at, updated_at, likes, published, tags FROM article WHERE slug = $1";
 
-pub const GET_ALL_ARTICLE: &str = "SELECT uuid, title, content, summary, slug, created_at, updated_at, likes, published, tags FROM article";
+pub const GET_ALL_ARTICLE: &str = "SELECT * FROM article";
 
 pub const UPDATE_SINGLE_ARTICLE_TITLE: &str = "UPDATE article SET title = $2 WHERE slug = $1";
 
@@ -52,3 +55,5 @@ pub const UPDATE_SINGLE_ARTICLE_PUBLISHED: &str =
 
 pub const DELETE_SINGLE_ARTICLE: &str = "DELETE FROM article WHERE slug = $1";
 // end article schema/statements
+
+pub const ADD_AUTHOR_ID: &str = "ALTER TABLE article ADD COLUMN IF NOT EXISTS author_id INT NOT NULL DEFAULT (1)";

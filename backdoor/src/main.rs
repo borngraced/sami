@@ -24,7 +24,7 @@ async fn main() -> SamiWebResponse<()> {
     dotenv().ok();
 
     let db = SamiCtx::ready().await?;
-    db.init_db().await.map_err(|e| e.into())?;
+    db.init_db().await?;
     let data = web::Data::new(db.client);
     let secret_key = Key::generate();
 
@@ -55,7 +55,7 @@ async fn main() -> SamiWebResponse<()> {
             .service(routes::update_one_article)
             .service(routes::delete_one_article)
     })
-    .bind("0.0.0.0:8088")
+    .bind(("127.0.0.1", 5500))
     .map_err(|e| ErrorResponse {
         field: None,
         message: Some(e.to_string()),
