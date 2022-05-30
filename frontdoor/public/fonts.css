@@ -1,0 +1,199 @@
+@font-face {
+  font-family: savoy-bold;
+  src: url("/fonts/Savoy-Bold-webfont.woff2") format("woff2");
+  font-display: swap;
+}
+@font-face {
+  font-family: savoy-italic;
+  src: url("/fonts/Savoy-Italic-webfont.woff2") format("woff2");
+  font-display: swap;
+}
+@font-face {
+  font-family: savoy-roman;
+  src: url("/fonts/Savoy-Roman-webfont.woff2") format("woff2");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: texta-light;
+  src: url("/fonts/Texta-Light-webfont.woff2") format("woff2");
+  font-display: swap;
+}
+@font-face {
+  font-family: texta-medium;
+  src: url("/fonts/Texta-Medium-webfont.woff2") format("woff2");
+  font-display: swap;
+}
+@font-face {
+  font-family: texta-heavy;
+  src: url("/fonts/Texta-Heavy-webfont.woff2") format("woff2");
+  font-display: swap;
+}
+@font-face {
+  font-family: harmoniaSans;
+  src: url("/fonts/ha-300.woff") format("woff");
+  font-weight: 300;
+  font-display: swap;
+}
+@font-face {
+  font-family: harmoniasans;
+  src: url("/fonts/h-600.woff") format("woff");
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: harmoniasans;
+  src: url("/fonts/harm.woff2") format("woff2"),
+    url("/fonts/harm-900.woff") format("woff");
+  font-weight: 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: Visby Cf;
+  src: url("/fonts/vsiby/VisbyCF-Thin.ttf") format("ttf");
+  src: url("/fonts/vsiby/VisbyCF-Thin.woff") format("woff");
+  src: url("/fonts/vsiby/VisbyCF-Thin.woff2") format("woff");
+  font-weight: 100;
+  font-display: swap;
+}
+@font-face {
+  font-family: Visby Cf;
+  src: url("/fonts/vsiby/VisbyCF-ThinOblique.ttf") format("ttf");
+  src: url("/fonts/vsiby/VisbyCF-ThinOblique.woff") format("woff");
+  src: url("/fonts/vsiby/VisbyCF-ThinOblique.woff2") format("woff");
+  font-weight: 100;
+  font-display: swap;
+  font-style: oblique;
+}
+@font-face {
+  font-family: Visby Cf;
+  src: url("/fonts/vsiby/VisbyCF-Light.ttf") format("ttf");
+  src: url("/fonts/vsiby/VisbyCF-Light.woff") format("woff");
+  src: url("/fonts/vsiby/VisbyCF-Light.woff2") format("woff");
+  font-weight: 300;
+  font-display: swap;
+}
+@font-face {
+  font-family: Visby Cf;
+  src: url("/fonts/vsiby/VisbyCF-LightOblique.ttf") format("ttf");
+  src: url("/fonts/vsiby/VisbyCF-LightOblique.woff") format("woff");
+  src: url("/fonts/vsiby/VisbyCF-LightOblique.woff2") format("woff");
+  font-weight: 300;
+  font-display: swap;
+  font-style: oblique;
+}
+@font-face {
+  font-family: Visby Cf;
+  src: url("/fonts/vsiby/VisbyCF-Medium.ttf") format("ttf");
+  src: url("/fonts/vsiby/VisbyCF-Medium.woff") format("woff");
+  src: url("/fonts/vsiby/VisbyCF-Medium.woff2") format("woff");
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: Visby Cf;
+  src: url("/fonts/vsiby/VisbyCF-MediumOblique.ttf") format("ttf");
+  src: url("/fonts/vsiby/VisbyCF-MediumOblique.woff") format("woff");
+  src: url("/fonts/vsiby/VisbyCF-MediumOblique.woff2") format("woff");
+  font-weight: 500;
+  font-display: swap;
+  font-style: oblique;
+}
+@font-face {
+  font-family: Visby Cf;
+  src: url("/fonts/vsiby/VisbyCF-Bold.ttf") format("ttf");
+  src: url("/fonts/vsiby/VisbyCF-Bold.woff") format("woff");
+  src: url("/fonts/vsiby/VisbyCF-Bold.woff2") format("woff");
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: Visby Cf;
+  src: url("/fonts/vsiby/VisbyCF-BoldOblique.ttf") format("ttf");
+  font-weight: 600;
+  font-display: swap;
+  font-style: oblique;
+}
+@font-face {
+  font-family: Visby Cf;
+  src: url("/fonts/vsiby/VisbyCF-DemiBold.ttf") format("ttf");
+  src: url("/fonts/vsiby/VisbyCF-DemiBold.woff") format("woff");
+  src: url("/fonts/vsiby/VisbyCF-DemiBold.woff2") format("woff");
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: Visby Cf;
+  src: url("/fonts/vsiby/VisbyCF-DemiBoldOblique.ttf") format("ttf");
+  src: url("/fonts/vsiby/VisbyCF-DemiBoldOblique.woff") format("woff");
+  src: url("/fonts/vsiby/VisbyCF-DemiBoldOblique.woff2") format("woff");
+  font-weight: 700;
+  font-display: swap;
+  font-style: oblique;
+}
+@font-face {
+  font-family: Visby Cf;
+  src: url("/fonts/vsiby/VisbyCF-ExtraBold.ttf") format("ttf");
+  src: url("/fonts/vsiby/VisbyCF-ExtraBold.woff") format("woff");
+  src: url("/fonts/vsiby/VisbyCF-ExtraBold.woff2") format("woff");
+  font-weight: 800;
+  font-display: swap;
+}
+@font-face {
+  font-family: Visby Cf;
+  src: url("/fonts/vsiby/VisbyCF-ExtraBoldOblique.ttf") format("ttf");
+  src: url("/fonts/vsiby/VisbyCF-ExtraBoldOblique.woff") format("woff");
+  src: url("/fonts/vsiby/VisbyCF-ExtraBoldOblique.woff2") format("woff");
+  font-weight: 800;
+  font-display: swap;
+  font-style: oblique;
+}
+@font-face {
+  font-family: Visby Cf;
+  src: url("/fonts/vsiby/VisbyCF-Heavy.ttf") format("ttf");
+  src: url("/fonts/vsiby/VisbyCF-Heavy.woff") format("woff");
+  src: url("/fonts/vsiby/VisbyCF-Heavy.woff2") format("woff");
+  font-weight: 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: Visby Cf;
+  src: url("/fonts/vsiby/VisbyCF-HeavyOblique.ttf") format("ttf");
+  src: url("/fonts/vsiby/VisbyCF-HeavyOblique.woff") format("woff");
+  src: url("/fonts/vsiby/VisbyCF-HeavyOblique.woff2") format("woff");
+  font-weight: 900;
+  font-display: swap;
+  font-style: oblique;
+}
+.harmoniasans {
+  font-family: "Harmoniasans", "Helvetica Neue", "Helvetica", "Roboto", "Arial",
+    "sans-serif" !important;
+}
+.vvw {
+  font-family: "Visby Cf", "Helvetica Neue", "Helvetica", "Roboto", "Arial",
+    "sans-serif" !important;
+}
+.savoy-bold {
+  font-family: "savoy-bold", "Helvetica Neue", "Helvetica", "Roboto", "Arial",
+    "sans-serif" !important;
+}
+.savoy-roman {
+  font-family: "savoy-roman", "Helvetica Neue", "Helvetica", "Roboto", "Arial",
+    "sans-serif" !important;
+}
+.savoy-italic {
+  font-family: "savoy-italic", "Helvetica Neue", "Helvetica", "Roboto", "Arial",
+    "sans-serif" !important;
+}
+.texta-heavy {
+  font-family: "texta-heavy", "Helvetica Neue", "Helvetica", "Roboto", "Arial",
+    "sans-serif" !important;
+}
+.texta-medium {
+  font-family: "texta-medium", "Helvetica Neue", "Helvetica", "Roboto", "Arial",
+    "sans-serif" !important;
+}
+.texta-light {
+  font-family: "texta-light", "Helvetica Neue", "Helvetica", "Roboto", "Arial",
+    "sans-serif" !important;
+}
