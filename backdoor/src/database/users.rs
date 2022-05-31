@@ -3,13 +3,16 @@ use derive_more::Display;
 use serde::{Deserialize, Serialize};
 use tokio_postgres::{types::ToSql, Client};
 
-use crate::common::{
-    error::{ErrorResponse, SamiStatusCode},
-    responder::{SamiResponder, SamiWebResponse},
-    validator::{
-        encode_password, validate_email, validate_password, validate_username, verify_password,
+use crate::{
+    common::{
+        error::{ErrorResponse, SamiStatusCode},
+        responder::{SamiResponder, SamiWebResponse},
+        validator::{
+            encode_password, validate_email, validate_password, validate_username, verify_password,
+        },
+        Role, UserData,
     },
-    Role, UserData,
+    routes::get_all_article,
 };
 
 use super::statements::{GET_SINGLE_USER, INSERT_USER};
@@ -73,7 +76,7 @@ pub async fn login(
     // IF VALID USER
     info!("Creatinng session with user email {}../", user.email);
     let email: String = row.get("email");
-    let _ = session
+    let get_ss = session
         .insert("user_email", &email)
         .map_err(|e| ErrorResponse {
             field: None,

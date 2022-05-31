@@ -10,8 +10,6 @@ export const action: ActionFunction = async ({ request }) => {
     return { error: true, message: "Invalid fields detected" };
   }
 
-  console.log(request.method);
-
   let token = process.env.TOKEN;
   const headers = {
     headers: {

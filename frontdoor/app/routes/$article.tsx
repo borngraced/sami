@@ -1,4 +1,4 @@
-import { json, LoaderFunction } from "@remix-run/node";
+import { LoaderFunction } from "@remix-run/node";
 import { useLoaderData, useSubmit } from "@remix-run/react";
 import React from "react";
 import { ArticleIT } from "~/components/common/Articles";
@@ -30,12 +30,6 @@ type Props = {};
 
 const ArticleSlug = (props: Props) => {
   const article = useLoaderData();
-  const submit = useSubmit();
-
-  const updateLikes = (event: any) => {
-    console.log("of");
-    submit(event.currentTarget, { replace: true });
-  };
 
   return (
     <main className="mx-auto max-w-4xl my-10 px-4 md:px-0">
