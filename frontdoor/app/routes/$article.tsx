@@ -55,7 +55,7 @@ const ArticleSlug = (props: Props) => {
       <Tags tags={article?.data?.tags} />
 
       <div className="block text-sm pt-3">
-        <form action="/article/messenger" className="post">
+        <form action="/article/messenger" method="put" className="post">
           <input
             type="text"
             name="slug"

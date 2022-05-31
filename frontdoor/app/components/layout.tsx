@@ -7,7 +7,7 @@ interface LayoutIt {
 
 const Layout = ({ isFor, children }:LayoutIt) => {
 return (
-    <div className="block max-w-screen-xl mx-auto p-2 md:p-4">
+    <div className="block max-w-screen-lg mx-auto p-2 md:p-4">
         {children}
     </div>
 )
